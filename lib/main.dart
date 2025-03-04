@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:foodie_app/pages/homepage.dart';
 import 'package:foodie_app/pages/onboarding/onboarding_main.dart';
+import 'package:foodie_app/pages/splash_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -32,7 +34,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const OnboardingMain(),
+      home: const SplashPage(),
     );
   }
 }
