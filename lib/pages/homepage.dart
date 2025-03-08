@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:foodie_app/pages/cartpage.dart';
+import 'package:foodie_app/pages/catitemspage.dart';
+import 'package:foodie_app/pages/dishdetailspage.dart';
 import 'package:foodie_app/provider/food_provider.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 
 class Homepage extends StatefulWidget {
@@ -33,15 +37,20 @@ class _HomepageState extends State<Homepage> {
           actions: [
             Padding(
               padding: EdgeInsets.only(right: 20),
-              child: CircleAvatar(
-                radius: 13,
-                backgroundColor: Colors.red,
-                child: Icon(
-                  Icons.shopping_cart,
-                  color: Colors.white,
-                  size: 15,
-                ),
-              ),
+              child: GestureDetector(
+                  child: CircleAvatar(
+                    radius: 13,
+                    backgroundColor: Colors.red,
+                    child: Icon(
+                      Icons.shopping_cart,
+                      color: Colors.white,
+                      size: 15,
+                    ),
+                  ),
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => Cartpage()));
+                  }),
             )
           ],
           backgroundColor: Color(0XFFf1f1f1),
@@ -50,6 +59,13 @@ class _HomepageState extends State<Homepage> {
         //Body
         body: Consumer<FoodProvider>(
           builder: (context, foodProvider, child) {
+            if (foodProvider.isLoading) {
+              return Center(
+                child: LoadingAnimationWidget.dotsTriangle(
+                    color: Colors.red, size: 50),
+              );
+            }
+
             return SingleChildScrollView(
               scrollDirection: Axis.vertical,
               child: Column(
@@ -85,45 +101,50 @@ class _HomepageState extends State<Homepage> {
                         itemBuilder: (context, index) {
                           final category = foodProvider.categories[index];
                           return Center(
-                            child: Container(
-                              margin: EdgeInsets.only(left: 10),
-                              height: 70,
-                              width: 160,
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10)),
-                              child: Row(
-                                // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  Image.network(
-                                    category.image,
-                                    height: 45,
-                                    width: 45,
-                                  ),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  Expanded(
-                                    child: RichText(
-                                      text: TextSpan(
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => CatItemspage(itemId: category.id, itemTitle: category.title,)));
+                              },
+                              child: Container(
+                                margin: EdgeInsets.only(left: 10),
+                                height: 70,
+                                width: 160,
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(10)),
+                                child: Row(
+                                  // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    Image.network(
+                                      category.image,
+                                      height: 45,
+                                      width: 45,
+                                    ),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    Expanded(
+                                      child: RichText(
+                                        text: TextSpan(
                                           text: category.title,
                                           style: TextStyle(
                                               fontWeight: FontWeight.w500,
-                                            color: Colors.black
-                                          ),
+                                              color: Colors.black),
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
                                       ),
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 1,
                                     ),
-                                  ),
-                                  SizedBox(width: 5),
-                                ],
+                                    SizedBox(width: 5),
+                                  ],
+                                ),
                               ),
                             ),
                           );
+
                         }),
                   ),
 
@@ -158,50 +179,67 @@ class _HomepageState extends State<Homepage> {
                         itemBuilder: (context, index) {
                           final popular = foodProvider.popularItems[index];
                           return Center(
-                            child: Container(
-                              margin: EdgeInsets.only(left: 10),
-                              height: 300,
-                              width: 200,
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10)),
-                              child: Column(
-                                children: [
-                                  SizedBox(height: 5,),
-                                  Text(popular.name, style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold
-                                  ),),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  Image.network(
-                                    popular.image,
-                                    height: 200,
-                                    width: 180,
-                                    fit: BoxFit.cover,
-                                  ),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  Row(children: [
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(context, MaterialPageRoute(
+                                    builder: (context) => Dishdetailspage(title: popular.name, description: popular.description, calories: popular.calories, image: popular.image)));
+                              },
+                              child: Container(
+                                margin: EdgeInsets.only(left: 10),
+                                height: 300,
+                                width: 200,
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(10)),
+                                child: Column(
+                                  children: [
                                     SizedBox(
-                                      width: 10,
+                                      height: 5,
                                     ),
-                                    Text(popular.calories.toString() + " Calories",style: TextStyle(
-                                      color: Colors.red
-                                    ),)
-                                  ]),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Row(children: [
+                                    Text(
+                                      popular.name,
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold),
+                                    ),
                                     SizedBox(
-                                      width: 10,
+                                      height: 10,
                                     ),
-                                    Text("the ohel fyel fhleog ")
-                                  ]),
-                                ],
+                                    Image.network(
+                                      popular.image,
+                                      height: 200,
+                                      width: 180,
+                                      fit: BoxFit.cover,
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Row(children: [
+                                      SizedBox(
+                                        width: 10,
+                                      ),
+                                      Text(
+                                        popular.calories.toString() + " Calories",
+                                        style: TextStyle(color: Colors.red),
+                                      )
+                                    ]),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    Row(children: [
+                                      SizedBox(
+                                        width: 10,
+                                      ),
+                                      Expanded(
+                                        child: Text(
+                                          popular.description,
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                        ),
+                                      )
+                                    ]),
+                                  ],
+                                ),
                               ),
                             ),
                           );
@@ -240,40 +278,62 @@ class _HomepageState extends State<Homepage> {
                         itemBuilder: (context, index) {
                           final special = foodProvider.specialItems[index];
                           return Center(
-                            child: Container(
-                              margin: EdgeInsets.only(left: 10),
-                              height: 100,
-                              width: 300,
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10)),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  SizedBox(width: 10,),
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Image.network(
-                                      special.image,
-                                      height: 80,
-                                      width: 80,
-                                      fit: BoxFit.cover,
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => Dishdetailspage(title: special.name, image: special.image, calories: special.calories, description: special.description,)));
+                              },
+                              child: Container(
+                                margin: EdgeInsets.only(left: 10),
+                                height: 100,
+                                width: 300,
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(10)),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    SizedBox(
+                                      width: 10,
                                     ),
-
-                                  ),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(special.name, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
-                                      Text(special.calories.toString()+ " Calories", style: TextStyle(color: Colors.red),),
-                                      Text("Jollof Rice"),
-                                    ],
-                                  )
-                                ],
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: Image.network(
+                                        special.image,
+                                        height: 80,
+                                        width: 80,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    Expanded(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            special.name,
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 15),
+                                          ),
+                                          Text(
+                                            "${special.calories} Calories",
+                                            style: TextStyle(color: Colors.red),
+                                          ),
+                                          Text(
+                                            special.description,
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           );
